@@ -4,6 +4,7 @@ from collections import deque, OrderedDict
 
 def fifo(capacity: int, requests: list[int]) -> int:
     """Returns the number of cache misses under First-In, First-Out policy"""
+
     cache_misses = 0
     fifo_queue = deque()
     cache_set = set()
@@ -20,8 +21,60 @@ def fifo(capacity: int, requests: list[int]) -> int:
         cache_misses += 1
     return cache_misses
 
+def lru(capacity: int, requests: list[int]) -> int:
+    """Returns the number of cache misses under LRU policy"""
 
+    cache: OrderedDict[int, None] = OrderedDict()
+    misses = 0
 
+    for request in requests:
+        if request in cache:
+            cache.move_to_end(request)
+        else:
+            if len(cache) == capacity:
+                cache.popitem(last=False)
+            cache[request] = None
+            misses += 1
+
+    return misses
+
+def fif(capacity: int, requests: list[int]) -> int:
+    """Returns the number of cache misses under Farthest-In-Future policy"""
+
+    if capacity == 0:
+        return len(requests)
+
+    cache: set[int] = set()
+    misses = 0
+
+    for i, request in enumerate(requests):
+        if request in cache:    # cache hit
+            continue
+
+        misses += 1             # o.w. cache miss
+
+        if len(cache) < capacity:
+            cache.add(request)
+            continue
+
+        farthest_req = None
+        farthest_dist = -1
+
+        for item in cache:
+            try:
+                use_next = requests.index(item, i + 1)
+            except ValueError:
+                farthest_req = item
+                break
+
+            if use_next > farthest_dist:
+                farthest_dist = use_next
+                farthest_req = item
+
+        cache.remove(farthest_req)
+        cache.add(request)
+
+    return misses
 
 def main():
     """Usage: python eviction_policies.py <input_file>"""
@@ -47,9 +100,11 @@ def main():
 
     fifo_res = fifo(k, data)
     lru_res = lru(k, data)
+    fif_res = fif(k, data)
 
-    print("FIFO policy cache misses: ", fifo_res)
-    # print("LRU policy cache misses: ", lru_res)
+    print("First-In, First-Out policy cache misses: ", fifo_res)
+    print("Least-Recently-Used policy cache misses: ", lru_res)
+    print("Farthest-In-Future policy cache misses: ", fif_res)
 
     # Output:
     # FIFO  : <number_of_misses>
