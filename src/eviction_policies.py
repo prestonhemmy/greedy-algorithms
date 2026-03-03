@@ -102,14 +102,13 @@ def main():
     lru_res = lru(k, data)
     fif_res = fif(k, data)
 
-    print("First-In, First-Out policy cache misses: ", fifo_res)
-    print("Least-Recently-Used policy cache misses: ", lru_res)
-    print("Farthest-In-Future policy cache misses: ", fif_res)
-
-    # Output:
-    # FIFO  : <number_of_misses>
-    # LRU   : <number_of_misses>
-    # OPTFF : <number_of_misses>
+    # Ex. Output:
+    # FIFO  : 9
+    # LRU   : 8
+    # OPTFF : 6
+    print("FIFO  :", fifo_res)
+    print("LRU   :", lru_res)
+    print("OPTFF :", fif_res)
 
 
 if __name__ == '__main__':
