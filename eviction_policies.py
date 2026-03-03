@@ -2,6 +2,41 @@ import sys
 from collections import deque, OrderedDict
 
 
+def fifo(capacity: int, requests: list[int]) -> int:
+    """Returns the number of cache misses under First-In, First-Out policy"""
+    cache_misses = 0
+    fifo_queue = deque()
+    cache_set = set()
+    for request in requests:
+        if request in cache_set:
+            continue
+
+        if len(fifo_queue) == capacity:
+            evicted = fifo_queue.popleft()
+            cache_set.remove(evicted)
+
+        fifo_queue.append(request)
+        cache_set.add(request)
+        cache_misses += 1
+    return cache_misses
+
+def lru(capacity: int, requests: list[int]) -> int:
+    """Returns the number of cache misses under LRU policy"""
+
+    cache: OrderedDict[int, None] = OrderedDict()
+    misses = 0
+
+    for request in requests:
+        if request in cache:
+            cache.move_to_end(request)
+        else:
+            if len(cache) == capacity:
+                cache.popitem(last=False)
+            cache[request] = None
+            misses += 1
+
+    return misses
+
 
 def main():
     """Usage: python eviction_policies.py <input_file>"""
@@ -29,7 +64,7 @@ def main():
     lru_res = lru(k, data)
 
     print("FIFO policy cache misses: ", fifo_res)
-    # print("LRU policy cache misses: ", lru_res)
+    print("LRU policy cache misses: ", lru_res)
 
     # Output:
     # FIFO  : <number_of_misses>
